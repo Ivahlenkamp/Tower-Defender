@@ -2,6 +2,7 @@
 #Video Follow along part 2 https://www.youtube.com/watch?v=glah2YjuY2A
 #Video Follow along part 3 https://www.youtube.com/watch?v=vaGv2Pa-oWA
 #Video Follow along part 4 https://www.youtube.com/watch?v=ZB4_x28dFCw&t=2s
+#Video Follow along part 5 https://www.youtube.com/watch?v=Q6Wm-8ecL-o 
 #import libraries
 #images link https://github.com/russs123/Castle_Defender/blob/main/Castle_Defender.zip
 #install [pip install pygame]
@@ -28,6 +29,8 @@ fps = 60                      #Sets fps
 bg = pygame.image.load('img/bg.png').convert_alpha() #background photo
 #castle image
 castle_img_100 = pygame.image.load('img\castle\castle_100.png').convert_alpha() #object oriented
+castle_img_50 = pygame.image.load('img\castle\castle_50.png').convert_alpha() #object oriented
+castle_img_25 = pygame.image.load('img\castle\castle_25.png').convert_alpha() #object oriented
 
 #bullet image
 bullet_img = pygame.image.load('img/bullet.png').convert_alpha()
@@ -70,7 +73,7 @@ WHITE= (255,255,255)
 
 #castle class
 class castle():  #object/constructor
-      def __init__(self, image100, x, y, scale): #Scale because size changes, different factors to track
+      def __init__(self, image100, image50, image25, x, y, scale): #Scale because size changes, different factors to track
             self.health = 1000
             self.max_health = self.health
             self.fired = False
@@ -81,6 +84,8 @@ class castle():  #object/constructor
             height= image100.get_height()
 
             self.image100 = pygame.transform.scale(image100, (int(width*scale), (int(height * scale))))
+            self.image50 = pygame.transform.scale(image50, (int(width*scale), (int(height * scale))))
+            self.image25 = pygame.transform.scale(image25, (int(width*scale), (int(height * scale))))
             self.rect = self.image100.get_rect()  #Create rectangle around it to create position to move it
             self.rect.x = x
             self.rect.y = y
@@ -100,7 +105,13 @@ class castle():  #object/constructor
                   self.fired = False
 
       def draw(self):   #method within
-            self.image = self.image100
+            #check which image to use based pon health
+            if self.health <+ 250:
+                  self.image = self.image25
+            elif self.health <=500:
+                  self.image = self.image50
+            else:
+                  self.image = self.image100
 
             screen.blit(self.image, self.rect) #Calling rectangle you created
 
@@ -126,9 +137,30 @@ class Bullet(pygame.sprite.Sprite): #sprite built in pygame functionality
             #move bullet
             self.rect.x += self.dx
             self.rect.y += self.dy
-            
+
+class Crosshair():
+      def __init__(self, scale):
+            image = pygame.image.load('img/crosshair.png').convert_alpha()
+            width = image.get_width()
+            height = image.get_height()
+
+            self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+            self.rect = self.image.get_rect()
+
+            pygame.mouse.set_visible(False)
+
+      def draw(self):
+            mx, my = pygame.mouse.get_pos()
+            self.rect.center = (mx, my)
+            screen.blit(self.image, self.rect)
+
+
+
 #create castle, call all the arguments
-castle = castle(castle_img_100, SCREEN_WIDTH - 250, SCREEN_HEIGHT - 300, .2) #.2 is percentage of image size
+castle = castle(castle_img_100, castle_img_50, castle_img_25, SCREEN_WIDTH - 250, SCREEN_HEIGHT - 300, .2) #.2 is percentage of image size
+
+#Create Crosshair
+crosshair = Crosshair(.025)
 
 """Groups"""
 bullet_group = pygame.sprite.Group()
@@ -153,6 +185,9 @@ while run:
       #Draw castle
       castle.draw()
       castle.shoot()
+
+      #draw crosshair
+      crosshair.draw()
 
 
       #draw bullet
