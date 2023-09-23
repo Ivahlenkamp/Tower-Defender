@@ -4,6 +4,7 @@
 #Video Follow along part 4 https://www.youtube.com/watch?v=ZB4_x28dFCw&t=2s
 #Video Follow along part 5 https://www.youtube.com/watch?v=Q6Wm-8ecL-o 
 #Video Follow along part 6 https://www.youtube.com/watch?v=Y_ldIQgM3CU 
+#Video Follow along part 7 https://www.youtube.com/watch?v=N0VvHLm6cK0 
 #import libraries
 #images link https://github.com/russs123/Castle_Defender/blob/main/Castle_Defender.zip
 #install [pip install pygame]
@@ -25,6 +26,12 @@ pygame.display.set_caption('Castle defender')
 
 clock= pygame.time.Clock()    #Sets frames so it doesnt max out constantly
 fps = 60                      #Sets fps
+
+#define game variables
+MAX_ENEMIES = 10
+ENEMY_TIMER = 1000
+last_enemy = pygame.time.get_ticks
+enemies_alive = 0
 
 """load images, Folder attached possible that your path is not the same"""
 bg = pygame.image.load('img/bg.png').convert_alpha() #background photo
@@ -167,12 +174,6 @@ crosshair = Crosshair(.025)
 bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 
-"""Create Enemies"""
-#our class and passing the enemies through it all
-enemy_1 = Enemy(enemy_health[0], enemy_animations[0], 200, SCREEN_HEIGHT - 100, 1)
-#groups have built in update and draw methods
-enemy_group.add(enemy_1)
-
 
 
 #game loop
@@ -198,6 +199,18 @@ while run:
 
       #draw enemies
       enemy_group.update(screen, castle, bullet_group)
+
+      #create enemies
+      #check if max number of enemies had been reached
+      if len(enemy_group) < MAX_ENEMIES:
+            """Create Enemies"""
+      
+            #our class and passing the enemies through it all
+            enemy= Enemy(enemy_health[0], enemy_animations[0], -100, SCREEN_HEIGHT - 100, 1)
+            #groups have built in update and draw methods
+            enemy_group.add(enemy)
+            #reset enemy timer
+            last_enemy = pygame.time.get_ticks()
 
       #event handler 
       for event in pygame.event.get():
