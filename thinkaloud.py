@@ -3,6 +3,7 @@
 #Video Follow along part 3 https://www.youtube.com/watch?v=vaGv2Pa-oWA
 #Video Follow along part 4 https://www.youtube.com/watch?v=ZB4_x28dFCw&t=2s
 #Video Follow along part 5 https://www.youtube.com/watch?v=Q6Wm-8ecL-o 
+#Video Follow along part 6 https://www.youtube.com/watch?v=Y_ldIQgM3CU 
 #import libraries
 #images link https://github.com/russs123/Castle_Defender/blob/main/Castle_Defender.zip
 #install [pip install pygame]
