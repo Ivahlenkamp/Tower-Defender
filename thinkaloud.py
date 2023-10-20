@@ -10,6 +10,7 @@
 #install [pip install pygame]
 import pygame
 import math
+import random
 from enemy import Enemy
 
 
@@ -28,10 +29,22 @@ clock= pygame.time.Clock()    #Sets frames so it doesnt max out constantly
 fps = 60                      #Sets fps
 
 #define game variables
-MAX_ENEMIES = 10
-ENEMY_TIMER = 1000
-last_enemy = pygame.time.get_ticks
+level= 1
+level_difficulty= 0
+target_difficulty= 1000
+DIFFICULTY_MULTIPLYER = 1.1
+game_over = False
+next_level = False
+ENEMY_TIMER = 500
+last_enemy = pygame.time.get_ticks()
 enemies_alive = 0
+
+"""define colors"""
+WHITE= (255,255,255)
+
+# define font
+font = pygame.font.SysFont('Futura', 30)
+font_60 = pygame.font.SysFont('Futura', 60)
 
 """load images, Folder attached possible that your path is not the same"""
 bg = pygame.image.load('img/bg.png').convert_alpha() #background photo
@@ -49,8 +62,8 @@ bullet_img = pygame.transform.scale(bullet_img, (int(b_w * .075), int(b_h * .075
 # load enemies images
 #setting your global parameters using lists
 enemy_animations = []
-enemy_types = ['knight']
-enemy_health = [75]
+enemy_types = ['knight', 'goblin', 'purple_goblin', 'red_goblin']
+enemy_health = [75, 100, 125, 150]
 
 animation_types = ['walk', 'attack', 'death']
 for enemy in enemy_types:
@@ -74,10 +87,13 @@ for enemy in enemy_types:
             animation_list.append(temp_list)
       enemy_animations.append(animation_list)
 
+#function for outputting text onto screen
+def draw_text(text, font, text_col, x, y):
+      img = font.render(text, True, text_col)
+      screen.blit(img, (x,y))
 
 
-"""define colors"""
-WHITE= (255,255,255)
+
 
 #castle class
 class castle():  #object/constructor
@@ -202,15 +218,46 @@ while run:
 
       #create enemies
       #check if max number of enemies had been reached
-      if len(enemy_group) < MAX_ENEMIES:
+      if level_difficulty < target_difficulty:
             """Create Enemies"""
-      
-            #our class and passing the enemies through it all
-            enemy= Enemy(enemy_health[0], enemy_animations[0], -100, SCREEN_HEIGHT - 100, 1)
-            #groups have built in update and draw methods
-            enemy_group.add(enemy)
-            #reset enemy timer
-            last_enemy = pygame.time.get_ticks()
+            if pygame.time.get_ticks() - last_enemy > ENEMY_TIMER:
+                  #create enemies
+                  e = random.randint(0, len(enemy_types) - 1)
+
+                  #our class and passing the enemies through it all
+                  enemy= Enemy(enemy_health[e], enemy_animations[e], -50, SCREEN_HEIGHT - 100, 1)
+                  #groups have built in update and draw methods
+                  enemy_group.add(enemy)
+                  #reset enemy timer
+                  last_enemy = pygame.time.get_ticks()
+                  # Increase level difficulty by enemy health
+                  level_difficulty += enemy_health[e]
+                  #print(level_difficulty)
+
+      #check if all enemies have been spawned
+      if level_difficulty >= target_difficulty:
+            #check how many are still alive
+            enemies_alive = 0
+            for e in enemy_group:
+                  if e.alive == True:
+                        enemies_alive +=1
+            # If there are none alive the level is complete
+            if enemies_alive == 0 and next_level == False:
+                  next_level = True
+                  level_reset_time = pygame.time.get_ticks()
+                  print(level_reset_time)
+
+      # Move onto next level
+      if next_level == True:
+            draw_text('LEVEL COMPLETE!', font_60, WHITE, 200, 300)
+
+            if pygame.time.get_ticks() - level_reset_time > 1500:
+                  next_Level = False
+                  level  += 1
+                  last_enemy = pygame.time.get_ticks()
+                  target_difficulty *= DIFFICULTY_MULTIPLYER
+                  level_difficulty = 0
+                  enemy_group.empty()
 
       #event handler 
       for event in pygame.event.get():
